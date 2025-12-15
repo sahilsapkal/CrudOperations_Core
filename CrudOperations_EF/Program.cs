@@ -1,4 +1,5 @@
 using CrudOperations_EF.Data;
+using CrudOperations_EF.Filters;
 using CrudOperations_EF.Middleware;
 using CrudOperations_EF.Services;
 using CustomMiddleWare.Middleware;
@@ -9,13 +10,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options => 
 options.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+
+
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<CrudOperationsService>();
+builder.Services.AddScoped<ActionLoggingFilter>();
+
+// used to log performance of queries 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Connection"))
+           .EnableSensitiveDataLogging()
+           .LogTo(Console.WriteLine, LogLevel.Information)
+);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
+
+
+//used for autorize filter using api key for swagger ui
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("ApiKey", new Microsoft.OpenApi.Models.OpenApiSecurityScheme

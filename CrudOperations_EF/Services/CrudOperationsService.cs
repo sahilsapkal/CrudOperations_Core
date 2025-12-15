@@ -25,22 +25,23 @@ namespace CrudOperations_EF.Services
         {
             try
             {
+                string key = $"user-{id}";
 
-            }
-            catch(Exception E) { }
-            string key = $"user-{id}";
-
-            if (!_cache.TryGetValue(key, out SahilTable? user))
-            {
-                user = await _context.SahilTable.FirstOrDefaultAsync(x => x.rowval == id);
-
-                if (user != null)
+                if (!_cache.TryGetValue(key, out SahilTable? user))
                 {
-                    _cache.Set(key, user, TimeSpan.FromMinutes(30));
-                }
-            }
+                    user = await _context.SahilTable.FirstOrDefaultAsync(x => x.rowval == id);
 
-            return user;
+                    if (user != null)
+                    {
+                        _cache.Set(key, user, TimeSpan.FromMinutes(30));
+                    }
+                }
+
+                return user;
+
+            }
+            catch(Exception E) { return new SahilTable(); }
+            
         }
 
         public async Task<List<SahilTable>> GetAll()
@@ -50,7 +51,7 @@ namespace CrudOperations_EF.Services
                 if (!_cache.TryGetValue(CacheKey, out List<SahilTable> users))
                 {
                     users = await _context.SahilTable.ToListAsync();
-                    var CacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(10))
+                    var CacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(2))
                         .SetAbsoluteExpiration(TimeSpan.FromHours(1));
 
                     _cache.Set(CacheKey, users, CacheOptions);

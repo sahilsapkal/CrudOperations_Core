@@ -1,4 +1,5 @@
 ﻿using CrudOperations_EF.Data;
+using CrudOperations_EF.Filters;
 using CrudOperations_EF.Models;
 using CrudOperations_EF.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,7 @@ namespace CrudOperations_EF.Controllers
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(ActionLoggingFilter))]
         public async Task<IActionResult> Getall()
         {
             //var emp = await _dbContext.SahilTable.ToListAsync();
